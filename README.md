@@ -1,4 +1,4 @@
-<img width="400" src="https://github.com/user-attachments/assets/44bac428-01bb-4fe9-9d85-96cba7698bee" alt="Tor Logo with the onion and a crosshair on it"/>
+<img width="400" src="https://github.com/user-attachments/assets/ed67ba36-d10b-4b57-945d-d6cde4e41ddf"/>
 
 # Threat Hunt Report: Unauthorized Privilege Escalation
 

@@ -6,7 +6,7 @@
 - Ubuntu 22.04 Virtual Machine (Microsoft Azure)
 - EDR Platform: Microsoft Defender for Endpoint
 - Kusto Query Language (KQL)
-- Linux Privilege Escalation Techniques
+- Bash (Shell Scripting)
 
 ## Scenario
 

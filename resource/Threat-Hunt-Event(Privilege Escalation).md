@@ -36,29 +36,20 @@
 ```kql
 // Detect privilege escalation attempts
 DeviceProcessEvents
-| where ProcessCommandLine has "sudo -l"
+| where ProcessCommandLine contains "sudo"
+| where ActionType in ("ProcessCreated", "ProcessExecuted")
 | project Timestamp, DeviceName, AccountName, ProcessCommandLine
 
-// Detect unauthorized modifications to sudoers file
+// Detect unauthorized modifications to system files
 DeviceFileEvents
-| where FileName == "/etc/sudoers"
+| where FileName in ("/etc/sudoers", "/etc/passwd", "/etc/group", "/etc/shadow")
 | where ActionType in ("FileModified", "FileCreated")
 | project Timestamp, DeviceName, AccountName, InitiatingProcessCommandLine
 
-// Detect new users added to the sudo group
-DeviceProcessEvents
-| where ProcessCommandLine has "usermod -aG sudo"
-| project Timestamp, DeviceName, AccountName, ProcessCommandLine
-
-// Detect SSH root login modifications
-DeviceFileEvents
-| where FileName == "/etc/ssh/sshd_config"
-| where ActionType in ("FileModified")
-| project Timestamp, DeviceName, AccountName, InitiatingProcessCommandLine
-
-// Detect unauthorized root SSH logins
+// Detect potential unauthorized logins
 DeviceLogonEvents
-| where AccountName == "root"
+| where AccountName contains "root" or AccountName contains "admin"
+| where LogonType in ("RemoteInteractive", "Interactive")
 | project Timestamp, DeviceName, AccountName, RemoteIP, LogonType
 ```
 

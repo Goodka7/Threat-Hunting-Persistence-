@@ -1,4 +1,4 @@
-<img width="400" src="https://github.com/user-attachments/assets/ed67ba36-d10b-4b57-945d-d6cde4e41ddf"/>
+<img width="400" src="https://github.com/user-attachments/assets/540106dd-b837-4281-ba96-cb836ab0ca25"/>
 
 # Threat Hunt Report: Unauthorized Privilege Escalation
 

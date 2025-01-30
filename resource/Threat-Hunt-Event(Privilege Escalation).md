@@ -1,95 +1,88 @@
-# Threat Event (Unauthorized TOR Usage)
-**Unauthorized TOR Browser Installation and Use**
+# Threat Event (Unauthorized Privilege Escalation)
+**Unauthorized Privilege Escalation & Persistence**
 
-## Steps the "Bad Actor" took Create Logs and IoCs:
-1. Download the TOR browser installer: https://www.torproject.org/download/
-2. Install it silently: ```tor-browser-windows-x86_64-portable-14.0.1.exe /S```
-3. Opens the TOR browser from the folder on the desktop
-4. Connect to TOR and browse a few sites.
-   - Current Dread Forum: ```g66ol3eb5ujdckzqqfmjsbpdjufmjd5nsgdipvxmsh7rckzlhywlzlqd.onion```
-   - Dark Markets Forum: ```g66ol3eb5ujdckzqqfmjsbpdjufmjd5nsgdipvxmsh7rckzlhywlzlqd.onion/d/DarkNetMarkets```
-   - Current Elysium Market: ```elysiumyeudtha62s4oaowwm7ifmnunz3khs4sllhvinphfm4nirfcqd.onion```
-6. Create a folder on your desktop called ```tor-shopping-list.txt``` and put a few fake (illicit) items in there
-7. Delete the file.
+## Steps the "Bad Actor" took to Create Logs and IoCs:
+1. Attempted to escalate privileges using `sudo -l` to check for accessible privileges.
+2. Modified the `/etc/sudoers` file to allow passwordless escalation.
+3. Added a new user to the `sudo` group using `usermod -aG sudo attacker`.
+4. Modified SSH settings (`/etc/ssh/sshd_config`) to allow root login.
+5. Restarted the SSH service (`systemctl restart sshd`).
+6. Attempted to clean up logs using `echo "" > ~/.bash_history`.
 
 ---
 
 ## Tables Used to Detect IoCs:
 | **Parameter**       | **Description**                                                              |
 |---------------------|------------------------------------------------------------------------------|
-| **Name**| DeviceFileEvents|
-| **Info**|https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceinfo-table|
-| **Purpose**| Used for detecting TOR download and installation, as well as the shopping list creation and deletion. |
-
-| **Parameter**       | **Description**                                                              |
-|---------------------|------------------------------------------------------------------------------|
 | **Name**| DeviceProcessEvents|
-| **Info**|https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceinfo-table|
-| **Purpose**| Used to detect the silent installation of TOR as well as the TOR browser and service launching.|
+| **Info**|https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table|
+| **Purpose**| Used to detect `sudo -l` execution, privilege escalation attempts, and `usermod` commands. |
 
 | **Parameter**       | **Description**                                                              |
 |---------------------|------------------------------------------------------------------------------|
-| **Name**| DeviceNetworkEvents|
-| **Info**|https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicenetworkevents-table|
-| **Purpose**| Used to detect TOR network activity, specifically tor.exe and firefox.exe making connections over ports to be used by TOR (9001, 9030, 9040, 9050, 9051, 9150).|
+| **Name**| DeviceFileEvents|
+| **Info**|https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table|
+| **Purpose**| Used to detect modifications to `/etc/sudoers`, `/etc/passwd`, and `/etc/group`. |
+
+| **Parameter**       | **Description**                                                              |
+|---------------------|------------------------------------------------------------------------------|
+| **Name**| DeviceLogonEvents|
+| **Info**|https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicelogonevents-table|
+| **Purpose**| Used to detect unauthorized root logins via SSH. |
 
 ---
 
 ## Related Queries:
 ```kql
-// Installer name == tor-browser-windows-x86_64-portable-(version).exe
-// Detect the installer being downloaded
-DeviceFileEvents
-| where FileName startswith "tor"
-
-// TOR Browser being silently installed
-// Take note of two spaces before the /S (I don't know why)
+// Detect privilege escalation attempts
 DeviceProcessEvents
-| where ProcessCommandLine contains "tor-browser-windows-x86_64-portable-14.0.1.exe  /S"
-| project Timestamp, DeviceName, ActionType, FileName, ProcessCommandLine
+| where ProcessCommandLine has "sudo -l"
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine
 
-// TOR Browser or service was successfully installed and is present on the disk
+// Detect unauthorized modifications to sudoers file
 DeviceFileEvents
-| where FileName has_any ("tor.exe", "firefox.exe")
-| project  Timestamp, DeviceName, RequestAccountName, ActionType, InitiatingProcessCommandLine
+| where FileName == "/etc/sudoers"
+| where ActionType in ("FileModified", "FileCreated")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessCommandLine
 
-// TOR Browser or service was launched
+// Detect new users added to the sudo group
 DeviceProcessEvents
-| where ProcessCommandLine has_any("tor.exe","firefox.exe")
-| project  Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine
+| where ProcessCommandLine has "usermod -aG sudo"
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine
 
-// TOR Browser or service is being used and is actively creating network connections
-DeviceNetworkEvents
-| where InitiatingProcessFileName in~ ("tor.exe", "firefox.exe")
-| where RemotePort in (9001, 9030, 9040, 9050, 9051, 9150)
-| project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, RemoteIP, RemotePort, RemoteUrl
-| order by Timestamp desc
+// Detect SSH root login modifications
+DeviceFileEvents
+| where FileName == "/etc/ssh/sshd_config"
+| where ActionType in ("FileModified")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessCommandLine
 
-// User shopping list was created and, changed, or deleted
-DeviceFileEvent
-| where FileName has_any (".txt", ".json")
+// Detect unauthorized root SSH logins
+DeviceLogonEvents
+| where AccountName == "root"
+| project Timestamp, DeviceName, AccountName, RemoteIP, LogonType
 ```
 
 ---
 
 ## Created By:
 - **Author Name**: James Harrington
-- **Author Contact**: https://www.linkedin.com/in/Goodk47/
-- **Date**: January 20, 2024
+- **Author Contact**: https://www.linkedin.com/in/Goodk47
+- **Date**: January 30, 2025
 
 ## Validated By:
-- **Reviewer Name**: 
-- **Reviewer Contact**: 
-- **Validation Date**: 
+- **Reviewer Name**:
+- **Reviewer Contact**:
+- **Validation Date**:
 
 ---
 
 ## Additional Notes:
-- **None**
+- **Ensure that root login is normally restricted to detect deviations effectively.**
 
 ---
 
 ## Revision History:
 | **Version** | **Changes**                   | **Date**         | **Modified By**   |
 |-------------|-------------------------------|------------------|-------------------|
-| 1.0         | Initial draft                  | `January 20, 2024`  | `James Harrington`   
+| 1.0         | Initial draft                  | `January 30, 2025`  | `James Harrington`    |
+

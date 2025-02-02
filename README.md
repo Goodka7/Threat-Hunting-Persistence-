@@ -10,7 +10,9 @@
 
 ## Scenario
 
-IT security suspects that a soon-to-be-terminated employee has created **backdoors and persistence mechanisms** to retain unauthorized access to company systems. The goal of this threat hunt is to detect **unauthorized persistence mechanisms**, escalate findings, and mitigate any potential risks.
+Management has raised concerns about a soon-to-be-terminated employee potentially creating unauthorized backdoors and persistence mechanisms to maintain illicit access to company systems. Suspicious activity has been detected on the machine `thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net`, where security teams suspect that multiple persistence techniques may have been deployed to retain unauthorized administrative control.
+
+The objective is to identify and analyze unauthorized persistence mechanisms, detect Indicators of Compromise (IOCs), and assess the extent of the security breach. Immediate action will be taken to address any identified threats.
 
 ### High-Level IoC Discovery Plan
 

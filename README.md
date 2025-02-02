@@ -24,16 +24,18 @@ The objective is to identify and analyze unauthorized persistence mechanisms, de
 
 ## Steps Taken
 
-### 1. Searched the `DeviceProcessEvents` Table
+### 1. Searched the `DeviceProcessEvents` Table for SUID Backdoor Creation & Execution
 
-Searched for any execution that involved unauthorized persistence mechanisms, particularly modifications to system services.
+**Objective:** Identify the creation and execution of a SUID backdoor (`/tmp/rootbash`) used for privilege escalation.
 
-At **Feb 2, 2025 1:44:54 PM**, the user **"baddog"** executed a command modifying the systemd service file **malicious.service** on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**.  
-
-The modification was performed using the following command:  
+At **Feb 2, 2025 3:54:17 PM**, the user **"baddog"** executed the following command on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**:
 ```bash
-systemctl status malicious.service
+sudo chown root:root /tmp/rootbash
 ```
+
+This action modified the ownership of the backdoor binary, setting it up for privilege escalation.
+
+Shortly after, at Feb 2, 2025 3:56:18 PM, the same user executed `/tmp/rootbash -p`. This confirms the successful execution of the backdoor, allowing privilege escalation to root.
 
 **Query used to locate events:**
 
@@ -43,6 +45,10 @@ DeviceProcessEvents
 | where ProcessCommandLine contains "authorized_keys" or ProcessCommandLine contains "echo" or ProcessCommandLine contains "cat"
 | project Timestamp, DeviceName, ActionType, ProcessCommandLine
 
+DeviceProcessEvents
+| where DeviceName == "thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"
+| where ProcessCommandLine contains "/tmp/rootbash"
+| project Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine
 ```
 <img width="1212" alt="image" src="https://github.com/user-attachments/assets/3c1fabbb-7fc1-4978-a99c-763d777dc109">
 ---

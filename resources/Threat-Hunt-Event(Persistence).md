@@ -1,11 +1,13 @@
 # Threat Event (Persistence & Backdoor Access)
 
+**Unauthorized Persistence Mechanisms & Backdoor Creation**
+
 ## Steps the "Bad Actor" took to Create Logs and IoCs:
 
 1. Created a rogue SSH key for persistent access by modifying `~/.ssh/authorized_keys`.
 2. Deployed a persistent backdoor by adding a malicious systemd service.
-3. Modified `~/.bashrc` to automatically execute a reverse shell upon user login.
-4. Created a Trojanized script that mimics a common administrative command to maintain access.
+3. Created a Trojanized script that mimics a common administrative command to maintain access.
+4. Created a SUID backdoor shell (`/tmp/rootbash`) to escalate privileges to root.
 
 ---
 
@@ -14,17 +16,19 @@
 | **Parameter** | **Description** |
 |--------------|----------------|
 | **Name** | DeviceProcessEvents |
-| **Info** | [Microsoft Documentation](https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table) |
-| **Purpose** | Used to detect unauthorized SSH key additions, cron job modifications, and suspicious system processes. |
+| **Info** | [DeviceProcessEvents Table](https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-deviceprocessevents-table) |
+| **Purpose** | Used to detect unauthorized execution of backdoor shells, Trojanized commands, and privilege escalation attempts. |
 
+| **Parameter** | **Description** |
+|--------------|----------------|
 | **Name** | DeviceFileEvents |
-|--------------|----------------|
-| **Info** | [Microsoft Documentation](https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table) |
-| **Purpose** | Used to detect modifications to `~/.ssh/authorized_keys`, `/etc/ssh/sshd_config`, and systemd service files. |
+| **Info** | [DeviceFileEvents Table](https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicefileevents-table) |
+| **Purpose** | Used to detect modifications to `~/.ssh/authorized_keys`, systemd service files, and creation of SUID backdoor binaries. |
 
-| **Name** | DeviceLogonEvents |
+| **Parameter** | **Description** |
 |--------------|----------------|
-| **Info** | [Microsoft Documentation](https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicelogonevents-table) |
+| **Name** | DeviceLogonEvents |
+| **Info** | [DeviceLogonEvents Table](https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-devicelogonevents-table) |
 | **Purpose** | Used to detect unauthorized remote logins or unusual authentication patterns. |
 
 ---
@@ -36,13 +40,23 @@
 DeviceFileEvents
 | where FileName == "~/.ssh/authorized_keys"
 | where ActionType in ("FileCreated", "FileModified")
-| project Timestamp, DeviceName, AccountName, InitiatingProcessCommandLine
+| project Timestamp, DeviceName, ActionType, FileName, InitiatingProcessCommandLine
 
 // Detect modifications to SSH configuration
 DeviceFileEvents
 | where FileName == "/etc/ssh/sshd_config"
 | where ActionType == "FileModified"
-| project Timestamp, DeviceName, AccountName, InitiatingProcessCommandLine
+| project Timestamp, DeviceName, ActionType, FileName, InitiatingProcessCommandLine
+
+// Detect execution of a Trojanized administrative command
+DeviceProcessEvents
+| where ProcessCommandLine contains "~/.local/bin/ls"
+| project Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine
+
+// Detect execution of a SUID backdoor shell
+DeviceProcessEvents
+| where ProcessCommandLine contains "/tmp/rootbash"
+| project Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine
 
 // Detect potential unauthorized logins
 DeviceLogonEvents

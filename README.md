@@ -147,48 +147,82 @@ DeviceProcessEvents
 
 ## Chronological Event Timeline 
 
-### 1. File Download - TOR Installer
+### 1. File Download - SUID Backdoor Binary
 
-- **Time:** `3:29:50 PM, January 20, 2025`
-- **Event:** The user "employee" downloaded a file named `tor-browser-windows-x86_64-portable-14.0.4.exe` to the Downloads folder.
-- **Action:** File download detected.
-- **File Path:** `C:\Users\labuser\Downloads\tor-browser-windows-x86_64-portable-14.0.4.exe`
-
-### 2. Process Execution - TOR Browser Installation
-
-- **Time:** `3:30:55 PM, January 20, 2025`
-- **Event:** The user "labuser" executed the file `tor-browser-windows-x86_64-portable-14.0.4.exe` in silent mode, initiating a background installation of the TOR Browser.
-- **Action:** Process creation detected.
-- **Command:** `cmd.exe /c powershell.exe -ExecutionPolicy Bypass -Command "Start-Process \"C:\Downloads\tor-browser-windows-x86_64-portable-14.0.4.exe\" -ArgumentList '/S' -NoNewWindow -Wait".`
-- **File Path:** `C:\Users\labuser\Downloads\tor-browser-windows-x86_64-portable-14.0.1.exe`
-
-### 3. Process Execution - TOR Browser Launch
-
-- **Time:** `3:42:26 PM to 3:42:49 PM, January 20, 2025`
-- **Event:** User "employee" opened the TOR browser. Subsequent processes associated with TOR browser, such as `firefox.exe` and `tor.exe`, were also created, indicating that the browser launched successfully.
-- **Action:** Process creation of TOR browser-related executables detected.
-- **File Path:** `C:\Users\labuser\Desktop\Tor Browser\Browser\TorBrowser\Tor\tor.exe`
-
-### 4. Network Connection - TOR Network
-
-- **Time:** `3:43:03 PM, January 20, 2025`
-- **Event:** A network connection to IP `45.21.116.144` on port `9001` by user "labuser" was established using `tor.exe`, confirming TOR browser network activity.
-- **Action:** Connection success.
-- **Process:** `tor.exe`
-- **File Path:** `c:\users\labuser\desktop\tor browser\browser\torbrowser\tor\tor.exe`
-
-### 5. Additional Network Connections - TOR Browser Activity
-
-- **Time:** `3:43:36 PM, January 20, 2025` - Local connection to `127.0.0.1` on port `9150`.
-- **Event:** Additional TOR network connections were established, indicating ongoing activity by user "employee" through the TOR browser.
-- **Action:** Multiple successful connections detected.
-
-### 6. File Creation - TOR Shopping List
-
-- **Time:** `3:51 to 3:55 PM, January 20, 2025`
-- **Event:** The user "labuser" created a folder named `tor-shopping-list` on the desktop, and created several files with names that are potentially related to their TOR browser activities.
+- **Time:** `Feb 2, 2025 3:54:17 PM`
+- **Event:** The user "baddog" downloaded and created a malicious backdoor binary (`/tmp/rootbash`) to be used for privilege escalation.
 - **Action:** File creation detected.
-- **File Path:** `C:\Users\labuser\Desktop\tor-shopping-list`
+- **File Path:** `/tmp/rootbash`
+
+### 2. Process Execution - Privilege Escalation Attempt
+
+- **Time:** `Feb 2, 2025 3:54:17 PM`
+- **Event:** The user "baddog" executed the command `sudo chown root:root /tmp/rootbash` to set the ownership of the `/tmp/rootbash` binary to root for privilege escalation.
+- **Action:** Process creation detected.
+- **Command:** `sudo chown root:root /tmp/rootbash`
+- **File Path:** `/tmp/rootbash`
+
+### 3. Process Execution - Setting SUID on Backdoor Binary
+
+- **Time:** `Feb 2, 2025 3:55:22 PM`
+- **Event:** The user "baddog" executed the command `sudo chmod u+s /tmp/rootbash` to set the SUID on the backdoor binary, ensuring any user who executes it would gain root privileges.
+- **Action:** Process creation detected.
+- **Command:** `sudo chmod u+s /tmp/rootbash`
+- **File Path:** `/tmp/rootbash`
+
+### 4. Process Execution - SUID Backdoor Execution
+
+- **Time:** `Feb 2, 2025 3:56:18 PM`
+- **Event:** The user "baddog" executed the SUID backdoor binary `/tmp/rootbash`, confirming the escalation of privileges to root.
+- **Action:** Process execution detected.
+- **Command:** `/tmp/rootbash -p`
+- **File Path:** `/tmp/rootbash`
+
+### 5. Additional Privilege Escalation Attempts
+
+- **Time:** `Feb 2, 2025 3:57:45 PM`
+- **Event:** The user "baddog" executed additional processes related to privilege escalation, confirming continued use of the SUID backdoor for root access.
+- **Action:** Process execution detected.
+- **Command:** `/tmp/rootbash`
+- **File Path:** `/tmp/rootbash`
+
+### 6. File Creation - Malicious Systemd Service
+
+- **Time:** `Feb 2, 2025 3:59:50 PM`
+- **Event:** The user "baddog" created a malicious systemd service called `malicious.service` to ensure persistent access through service execution.
+- **Action:** File creation detected.
+- **File Path:** `/etc/systemd/system/malicious.service`
+
+### 7. Process Execution - Starting Malicious Systemd Service
+
+- **Time:** `Feb 2, 2025 4:01:30 PM`
+- **Event:** The user "baddog" executed the command `sudo systemctl start malicious.service`, activating the malicious service to ensure the backdoor remains running.
+- **Action:** Process execution detected.
+- **Command:** `sudo systemctl start malicious.service`
+- **File Path:** `/etc/systemd/system/malicious.service`
+
+### 8. File Creation - Trojanized `ls` Command
+
+- **Time:** `Feb 2, 2025 4:05:42 PM`
+- **Event:** The user "baddog" created a Trojanized version of the `ls` command at `/home/baddog/.local/bin/ls`, which was used to maintain persistent access by executing a reverse shell upon being run.
+- **Action:** File creation detected.
+- **File Path:** `/home/baddog/.local/bin/ls`
+
+### 9. Process Execution - Trojanized `ls` Command Execution
+
+- **Time:** `Feb 2, 2025 4:06:05 PM`
+- **Event:** The user "baddog" executed the Trojanized `ls` command, which established a reverse shell connection back to the attacker's machine.
+- **Action:** Process execution detected.
+- **Command:** `/home/baddog/.local/bin/ls`
+- **File Path:** `/home/baddog/.local/bin/ls`
+
+### 10. Additional SUID Backdoor Execution
+
+- **Time:** `Feb 2, 2025 4:10:20 PM`
+- **Event:** The user "baddog" executed `/tmp/rootbash` again to confirm privilege escalation, ensuring continued root access on the system.
+- **Action:** Process execution detected.
+- **Command:** `/tmp/rootbash -p`
+- **File Path:** `/tmp/rootbash`
 
 ---
 

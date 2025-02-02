@@ -122,24 +122,26 @@ DeviceProcessEvents
 
 ---
 
-### 4. Searched the `DeviceNetworkEvents` Table for TOR Network Connections
+### 4. Searched the `DeviceProcessEvents` Table for Trojanized `ls` Execution
 
-Searched for any indication the TOR browser was used to establish a connection using any of the known TOR ports. The results showed user “labuser” did indeed use tor to connect to an url.
+**Objective:** Detect the execution of a Trojanized script (`ls`) used to maintain unauthorized access.
 
-At 3:43:03 PM on January 20, 2025, a successful connection was made by the user "labuser" from the device "hardmodevm" to the remote IP address 45.21.116.144 on port 9001. The connection was made using the file "tor.exe," and the remote URL accessed was https://www.35yt53tip6fr4hoov4a.com.
-
+At **Feb 2, 2025 4:00:13 PM**, the user **"baddog"** executed the following command on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**:
+```
+~/.local/bin/ls
+```
+This command runs a Trojanized version of the `ls` utility, which was replaced by a script that attempts to establish a reverse shell connection back to the attacker's machine. This action indicates the attempt to maintain access by running malicious scripts under the guise of a common administrative command.
 
 **Query used to locate events:**
 
 ```kql
-DeviceNetworkEvents
-| where DeviceName  == "hardmodevm"
-| where InitiatingProcessAccountName == "labuser"
-| where RemotePort in ("9001", "9030", "9040", "9050", "9051", "9150", "80", "443")  
-| project Timestamp, DeviceName, InitiatingProcessAccountName, ActionType, RemoteIP, RemotePort, RemoteUrl, InitiatingProcessFileName, InitiatingProcessFolderPath  
-| order by Timestamp desc
+// Detect execution of Trojanized 'ls' command
+DeviceProcessEvents
+| where DeviceName == "thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"
+| where ProcessCommandLine contains "/home/baddog/.local/bin/ls"
+| project Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine 
 ```
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/f88b30e1-ccca-4a3a-b601-65992d08f1d3">
+<img width="1212" alt="image" src="https://github.com/user-attachments/assets/505f75e4-e504-4865-87d9-1289d69ee748">
 
 ---
 

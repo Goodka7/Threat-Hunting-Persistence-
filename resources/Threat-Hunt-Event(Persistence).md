@@ -3,10 +3,9 @@
 ## Steps the "Bad Actor" took to Create Logs and IoCs:
 
 1. Created a rogue SSH key for persistent access by modifying `~/.ssh/authorized_keys`.
-2. Modified `/etc/ssh/sshd_config` to allow root login.
-3. Created a hidden cron job for remote command execution.
-4. Deployed a persistent backdoor by adding a malicious systemd service.
-5. Restarted the SSH service (`systemctl restart sshd`).
+2. Deployed a persistent backdoor by adding a malicious systemd service.
+3. Modified `~/.bashrc` to automatically execute a reverse shell upon user login.
+4. Created a Trojanized script that mimics a common administrative command to maintain access.
 
 ---
 

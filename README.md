@@ -29,6 +29,7 @@ The objective is to identify and analyze unauthorized persistence mechanisms, de
 Searched for any execution that involved unauthorized persistence mechanisms, particularly modifications to system services.
 
 At **Feb 2, 2025 1:44:54 PM**, the user **"baddog"** executed a command modifying the systemd service file **malicious.service** on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**.  
+
 The modification was performed using the following command:  
 ```bash
 systemctl status malicious.service
@@ -46,26 +47,24 @@ DeviceProcessEvents
 <img width="1212" alt="image" src="https://github.com/user-attachments/assets/3c1fabbb-7fc1-4978-a99c-763d777dc109">
 ---
 
-### 2. Searched the `DeviceProcessEvents` Table
+### 2. Searched the `DeviceLogonEvents` Table
 
-Searched for any `ProcessCommandLine` that contained the string "tor-browser-windows-x86_64-portable-14.0.4.exe". 
+Searched for any `AccountName` that was not "baddog" to detect unauthorized SSH logins.
 
-At 3:30:55 PM on January 20, 2025, the user "labuser" created a process called "cmd.exe" on the device "hardmodevm." The process was located in C:\Windows\System32\cmd.exe, with the SHA256 hash of badf4752413cb0cbdc03fb95820ca167f0cdc63b597ccdb5ef43111180e088b0. 
+At **Feb 2, 2025 3:15:01 PM**, the user **"root"** logged into the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"** via **Network logon type**, indicating a remote SSH connection.
 
-The command executed was:<span style="color: green;">
-"cmd.exe" /c powershell.exe -ExecutionPolicy Bypass -Command "Start-Process \"C:\Downloads\tor-browser-windows-x86_64-portable-14.0.4.exe\" -ArgumentList '/S' -NoNewWindow -Wait"</span>, which initiated the installation of the Tor Browser, silently.
+This suggests that a backdoor mechanism was used to gain unauthorized root access.
 
 **Query used to locate event:**
 
 ```kql
-
-DeviceProcessEvents
-| where DeviceName  == "hardmodevm"
-| where ProcessCommandLine contains "tor-browser-windows-x86_64-portable-14.0.4.exe"
-| order by Timestamp desc
-| project Timestamp, DeviceName, ActionType, FileName, FolderPath, SHA256, Account = InitiatingProcessAccountName, Command = ProcessCommandLine
+DeviceLogonEvents
+| where DeviceName == "thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"
+| where AccountName != "baddog"  // Look for unexpected SSH logins
+| where LogonType in ("RemoteInteractive", "Network")
+| project Timestamp, DeviceName, AccountName, RemoteIP, LogonType
 ```
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/a610791a-0559-410d-881d-397251039bbf">
+<img width="1212" alt="image" src="https://github.com/user-attachments/assets/c6eb0196-2d43-4f1f-bd9a-8b7acf6862cd">
 
 ---
 

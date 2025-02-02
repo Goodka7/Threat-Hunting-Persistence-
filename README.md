@@ -26,16 +26,31 @@ The objective is to identify and analyze unauthorized persistence mechanisms, de
 
 ### 1. Searched the `DeviceProcessEvents` Table for SUID Backdoor Creation & Execution
 
-**Objective:** Identify the creation and execution of a SUID backdoor (`/tmp/rootbash`) used for privilege escalation.
+Identify unauthorized privilege escalation attempts and backdoor persistence through SUID manipulation.
+
+At **Feb 2, 2025 1:33:49 PM**, the user **"baddog"** executed the following command on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**:
+```
+sh -c 'cat /proc/sys/kernel/random/uuid | awk -F- '{print $1$2$3$4$5}''
+```
+
+This command is commonly used to generate a unique identifier, possibly as part of a script used to automate privilege escalation or persistence.
 
 At **Feb 2, 2025 3:54:17 PM**, the user **"baddog"** executed the following command on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**:
-```bash
+```
 sudo chown root:root /tmp/rootbash
 ```
 
-This action modified the ownership of the backdoor binary, setting it up for privilege escalation.
+Shortly after, at 3:55:22 PM, the user set the SUID permission to ensure persistent root access:
+```
+sudo chmod u+s /tmp/rootbash
+```
 
-Shortly after, at Feb 2, 2025 3:56:18 PM, the same user executed `/tmp/rootbash -p`. This confirms the successful execution of the backdoor, allowing privilege escalation to root.
+Finally, at Feb 2, 2025 3:56:18 PM, the attacker executed:
+```
+/tmp/rootbash -p
+```
+
+This confirms the successful execution of the backdoor, allowing privilege escalation to root.
 
 **Query used to locate events:**
 

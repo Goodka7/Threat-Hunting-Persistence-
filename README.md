@@ -1,49 +1,47 @@
 <img width="400" src="https://github.com/user-attachments/assets/0912ebf5-3d20-4966-b083-ebf02fbf0ff6"/>
 
-# Threat Hunt Report: Presistence and Backdoor access
+# Threat Hunt Report: Unauthorized Persistence & Backdoor Creation
 
 ## Platforms and Languages Leveraged
-- Ubuntu 22.04 Virtual Machine (Microsoft Azure)
+- Linux (Ubuntu 22.04) Virtual Machines (Microsoft Azure)
 - EDR Platform: Microsoft Defender for Endpoint
 - Kusto Query Language (KQL)
-- Bash (Shell Scripting)
+- Bash
 
 ## Scenario
 
-Management suspects that an employee on the verge of termination is attempting to create backdoors and maintain persistent access to steal confidential information. The objective is to detect unauthorized persistence mechanisms and mitigate potential security risks.
+IT security suspects that a soon-to-be-terminated employee has created **backdoors and persistence mechanisms** to retain unauthorized access to company systems. The goal of this threat hunt is to detect **unauthorized persistence mechanisms**, escalate findings, and mitigate any potential risks.
 
-### High-Level Privilege Escalation IoC Discovery Plan
+### High-Level IoC Discovery Plan
 
-- **Check `DeviceFileEvents`** for unauthorized modifications to `~/.ssh/authorized_keys`, `/etc/ssh/sshd_config`, or suspicious script files.
-- **Check `DeviceProcessEvents`** for unexpected SSH key additions, cron job modifications, or rogue processes.
-- **Check `DeviceLogonEvents`** for unusual authentication patterns, such as logins from unauthorized sources or after termination hours.
+- **Check `DeviceFileEvents`** for modifications to `~/.ssh/authorized_keys`, systemd service files, and SUID binaries.
+- **Check `DeviceProcessEvents`** for suspicious executions, including unauthorized system service modifications and Trojanized commands.
+- **Check `DeviceLogonEvents`** for unusual remote login activity.
 
 ---
 
 ## Steps Taken
 
-### 1. Searched the `DeviceFileEvents` Table
+### 1. Searched the `DeviceProcessEvents` Table
 
-Searched for any file that had the string "tor", ".exe", ".txt", or ".json" in it. 
+Searched for any execution that involved unauthorized persistence mechanisms, particularly modifications to system services.
 
-At 3:39:26 PM on January 20, 2025, the user "labuser" created a file named "tor.exe" on the device "hardmodevm." The file was saved in the folder path: C:\Users\labuser\Desktop\Tor Browser\Browser\TorBrowser\Tor\tor.exe. The file's SHA256 hash is c3b431779278278cda8d2bf5de5d4da38025717630bfeae1a82c927d0703cd28.	
-
-The search yielded other items including the creation of a folder (tor-shopping-list) which held several artifacts of interest: several .txt files and a few .jsons, with names that suggest illicit activity.
-
+At **Feb 2, 2025 1:44:54 PM**, the user **"baddog"** executed a command modifying the systemd service file **malicious.service** on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**.  
+The modification was performed using the following command:  
+```bash
+systemctl status malicious.service
+```
 
 **Query used to locate events:**
 
 ```kql
-DeviceFileEvents
-| where DeviceName == "hardmodevm"
-| where FileName contains (“tor”, “.txt” , “.exe” , “.json”)
-| where InitiatingProcessAccountName == "labuser"
-| order by Timestamp desc
-| project Timestamp, DeviceName, ActionType, FileName, FolderPath, SHA256, Account = InitiatingProcessAccountName
-```
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/6f212b1a-e4f5-40dc-be67-2a0e4bd44c62">
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/db49fe7f-ee5b-468a-bf32-a0affe7b282d">
+DeviceProcessEvents
+| where DeviceName == "thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"
+| where ProcessCommandLine contains "authorized_keys" or ProcessCommandLine contains "echo" or ProcessCommandLine contains "cat"
+| project Timestamp, DeviceName, ActionType, ProcessCommandLine
 
+```
+<img width="1212" alt="image" src="https://github.com/user-attachments/assets/3c1fabbb-7fc1-4978-a99c-763d777dc109">
 ---
 
 ### 2. Searched the `DeviceProcessEvents` Table

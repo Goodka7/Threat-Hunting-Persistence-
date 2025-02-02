@@ -1,6 +1,6 @@
-<img width="400" src="https://github.com/user-attachments/assets/540106dd-b837-4281-ba96-cb836ab0ca25"/>
+<img width="400" src="https://github.com/user-attachments/assets/0912ebf5-3d20-4966-b083-ebf02fbf0ff6"/>
 
-# Threat Hunt Report: Unauthorized Privilege Escalation
+# Threat Hunt Report: Presistence and Backdoor access
 
 ## Platforms and Languages Leveraged
 - Ubuntu 22.04 Virtual Machine (Microsoft Azure)
@@ -10,13 +10,13 @@
 
 ## Scenario
 
-Management has detected unusual system modifications and unauthorized privilege escalations on a critical Ubuntu server. There have been reports of suspicious administrative actions occurring outside of normal business hours. The objective is to identify any unauthorized privilege escalations and assess potential security risks. If any signs of privilege escalation are found, notify management and initiate mitigation procedures.
+Management suspects that an employee on the verge of termination is attempting to create backdoors and maintain persistent access to steal confidential information. The objective is to detect unauthorized persistence mechanisms and mitigate potential security risks.
 
 ### High-Level Privilege Escalation IoC Discovery Plan
 
-- **Check `DeviceProcessEvents`** for any `sudo` or privilege escalation attempts.
-- **Check `DeviceFileEvents`** for any unauthorized modifications to `/etc/sudoers`, `/etc/passwd`, or `/etc/group`.
-- **Check `DeviceLogonEvents`** for any unauthorized root logins or unusual authentication attempts.
+- **Check `DeviceFileEvents`** for unauthorized modifications to `~/.ssh/authorized_keys`, `/etc/ssh/sshd_config`, or suspicious script files.
+- **Check `DeviceProcessEvents`** for unexpected SSH key additions, cron job modifications, or rogue processes.
+- **Check `DeviceLogonEvents`** for unusual authentication patterns, such as logins from unauthorized sources or after termination hours.
 
 ---
 

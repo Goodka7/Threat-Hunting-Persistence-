@@ -72,7 +72,7 @@ DeviceLogonEvents
 ---
 
 ## Additional Notes:
-
+**Notes**
 ---
 
 ## Revision History:

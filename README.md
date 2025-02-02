@@ -66,7 +66,7 @@ DeviceProcessEvents
 | project Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine
 ```
 <img width="1212" alt="image" src="https://github.com/user-attachments/assets/3c1fabbb-7fc1-4978-a99c-763d777dc109">
-<img width="1212" alt="image" ser="https://github.com/user-attachments/assets/cae6aeea-aa55-45e2-b0e4-e5d8b896dd84">
+<img width="1212" alt="image" src="https://github.com/user-attachments/assets/cae6aeea-aa55-45e2-b0e4-e5d8b896dd84">
 
 ---
 

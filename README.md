@@ -118,7 +118,7 @@ DeviceProcessEvents
 | where ProcessCommandLine contains "malicious.service"
 | project Timestamp, DeviceName, ActionType, ProcessCommandLine
 ```
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/785257b9-5e7c-4ce6-8bb2-f9f0c8c59f0f">
+<img width="1212" alt="image" src="https://github.com/user-attachments/assets/bab374b0-e90b-4c57-9689-a24fb506bf49">
 
 ---
 

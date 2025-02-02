@@ -228,12 +228,16 @@ DeviceProcessEvents
 
 ## Summary
 
-The user "labuser" on the device "hardmodevm" installed and used the Tor Browser, taking actions that raised concerns. First, "labuser" silently initiated the installation of the Tor Browser through a PowerShell command. After the installation, they created the "tor.exe" file and executed it, which started the Tor service with specific configurations. Additionally, multiple instances of "firefox.exe" associated with the Tor Browser were launched, and the user successfully connected to the Tor network, accessing a remote IP and URL, suggesting the use of Tor for anonymous browsing. Furthermore, a folder (tor-shopping-list) containing several .txt and .json files was created, holding several files with names indicating potential illicit activity. These actions suggest that the user may have been engaging in suspicious or unauthorized activities using the Tor network.
+The user "baddog" on the device "thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net" took deliberate actions to establish persistence and gain unauthorized root access. Initially, the attacker created a malicious backdoor binary (`/tmp/rootbash`) and modified its ownership to `root`. Following this, the attacker set the SUID permission on the binary, allowing any user to execute it with root privileges, effectively escalating their access. The attacker then executed the backdoor to confirm the privilege escalation.
+
+To ensure persistent access, the attacker created and enabled a **malicious systemd service** (`malicious.service`) which would automatically start the backdoor on system boot. Additionally, a **Trojanized `ls` command** was placed in the user's home directory (`~/.local/bin/ls`), which was executed to establish a reverse shell connection back to the attacker's machine.
+
+These actions suggest that the user "baddog" was attempting to establish a **backdoor and maintain persistent root access** on the system, bypassing security controls and potentially preparing for further unauthorized activities.
 
 ---
 
 ## Response Taken
 
-TOR usage was confirmed on the endpoint `hardmodevm` by the user `labuser`. The device was isolated, and the user's direct manager was notified.
+Unauthorized root access and backdoor activities were confirmed on the endpoint **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"** by the user **"baddog"**. The device was isolated, the backdoor and associated persistence mechanisms were disabled, and the user's direct manager was notified. Further investigation and remediation are underway to assess any potential data exfiltration or other malicious actions.
 
 ---

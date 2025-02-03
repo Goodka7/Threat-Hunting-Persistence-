@@ -238,6 +238,8 @@ These actions suggest that the user "baddog" was attempting to establish a **bac
 
 ## Response Taken
 
-Unauthorized root access and backdoor activities were confirmed on the endpoint **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"** by the user **"baddog"**. The device was isolated, the backdoor and associated persistence mechanisms were disabled, and the user's direct manager was notified. Further investigation and remediation are underway to assess any potential data exfiltration or other malicious actions.
+Unauthorized root access and backdoor activities were confirmed on the endpoint **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"** by the user **"baddog"**. 
+
+The device was isolated and the user's direct manager was notified. I recommend the backdoor and associated persistence mechanisms being disabled. Further investigation and remediation are underway to assess any potential data exfiltration or other malicious actions.
 
 ---

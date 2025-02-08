@@ -1,6 +1,6 @@
 <img width="400" src="https://github.com/user-attachments/assets/0912ebf5-3d20-4966-b083-ebf02fbf0ff6"/>
 
-# Threat Hunt Report: Unauthorized Persistence & Backdoor Creation
+# Threat Hunt Report: Unauthorized Persistence Creation
 - [Scenario Creation](https://github.com/Goodka7/Threat-Hunting-Persistence-/blob/main/resources/Threat-Hunt-Event(Persistence).md)
 
 ## Platforms and Languages Leveraged

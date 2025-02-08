@@ -1,6 +1,6 @@
-# Threat Event (Persistence & Backdoor Access)
+# Threat Event (Persistence)
 
-**Unauthorized Persistence Mechanisms & Backdoor Creation**
+**Unauthorized Persistence Mechanisms Creation**
 
 ## Steps the "Bad Actor" took to Create Logs and IoCs:
 
